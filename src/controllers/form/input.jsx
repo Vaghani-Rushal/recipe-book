@@ -1,6 +1,6 @@
 import React from "react";
-import { findInputError } from "../utils/findInputError";
-import { isFormInvalid } from "../utils/isFormInvalid";
+import { findInputError } from "../../utils/findInputError";
+import { isFormInvalid } from "../../utils/isFormInvalid";
 import { useFormContext } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import { MdError } from "react-icons/md";
@@ -30,6 +30,7 @@ export default function Input({
           {label}
         </label>
       )}
+
       {multiline ? (
         <textarea
           id={id}
@@ -52,6 +53,7 @@ export default function Input({
           {...register(name, validation)}
         />
       )}
+
       <AnimatePresence mode="wait" initial={false}>
         {isInvalid && (
           <InputError

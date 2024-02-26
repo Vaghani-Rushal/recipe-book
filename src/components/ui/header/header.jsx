@@ -1,26 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Logout from "../user/Logout";
+import LogoutModal from "../../../controllers/modals/logoutModal";
+import {
+  ABOUTUS_ROUTE,
+  ADD_RECIPE_ROUTE,
+  CONTACTUS_ROUTE,
+  LOGIN_ROUTE,
+  ROOT_ROUTE,
+  SIGNUP_ROUTE,
+} from "../../../constant/route.constant";
 
 export default function Header({
   search,
   setSearch,
   isEditable,
-  toggelEdit,
+  setIsEditable,
   storageDataChange,
   setStorageDataChange,
 }) {
-  const [customer, setCustomer] = useState({ isExist: false });
+  const [isUserLogin, setIsUserLogin] = useState({ isExist: false });
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
-    let customerData = localStorage.getItem("customerData");
+    let loginUserData = localStorage.getItem("loginUserData");
 
-    if (customerData) {
-      customerData = JSON.parse(customerData);
+    if (loginUserData) {
+      loginUserData = JSON.parse(loginUserData);
 
-      if (customerData.isExist) {
-        setCustomer({ ...customerData });
+      if (loginUserData.isExist) {
+        setIsUserLogin({ ...loginUserData });
       }
     }
   }, [storageDataChange]);
@@ -36,7 +44,7 @@ export default function Header({
         style={{ minHeight: "70px" }}
       >
         <div className="container-fluid">
-          <Link className="col-2 navbar-brand text-light" to="/">
+          <Link className="col-2 navbar-brand text-light" to={ROOT_ROUTE}>
             Recipe-Book
           </Link>
 
@@ -57,40 +65,42 @@ export default function Header({
                 <Link
                   className="nav-link text-light"
                   aria-current="page"
-                  to="/"
+                  to={ROOT_ROUTE}
                 >
                   Home
                 </Link>
               </li>
 
               <li className="nav-item">
-                <Link to="/addrecipe" className="nav-link text-light">
+                <Link to={ADD_RECIPE_ROUTE} className="nav-link text-light">
                   Add new Recipe
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link
-                  to={customer.isExist ? "/" : "/login"}
-                  onClick={() => {
-                    if (customer.isExist) toggelEdit(!isEditable);
-                  }}
-                  className="nav-link text-light"
-                >
-                  {!isEditable ? "Edit Recipes" : "Disable Edit"}
-                </Link>
-              </li>
+
+              {isUserLogin?.isExist && (
+                <li className="nav-item">
+                  <Link
+                    to={ROOT_ROUTE}
+                    onClick={() => setIsEditable(!isEditable)}
+                    className="nav-link text-light"
+                  >
+                    {!isEditable ? "Edit Recipes" : "Disable Edit"}
+                  </Link>
+                </li>
+              )}
 
               <li className="nav-item">
-                <Link className="nav-link text-light" to="/aboutus">
+                <Link className="nav-link text-light" to={ABOUTUS_ROUTE}>
                   About Us
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link text-light" to="/contactus">
+                <Link className="nav-link text-light" to={CONTACTUS_ROUTE}>
                   Contact Us
                 </Link>
               </li>
             </ul>
+
             <div className="col-4 nav-item mx-3">
               <div className="d-flex">
                 <input
@@ -99,9 +109,7 @@ export default function Header({
                   type="search"
                   placeholder="Search"
                   aria-label="Search"
-                  onChange={(event) => {
-                    setSearch(event.target.value);
-                  }}
+                  onChange={(event) => setSearch(event.target.value)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
                       event.preventDefault();
@@ -109,7 +117,8 @@ export default function Header({
                     }
                   }}
                 />
-                {customer.isExist ? (
+
+                {isUserLogin?.isExist ? (
                   <>
                     <Link
                       className="mx-2 btn btn-outline-primary"
@@ -118,19 +127,19 @@ export default function Header({
                     >
                       LogOut
                     </Link>
-                    <span className="mx-2 fs-4">{customer.name}</span>
+                    <span className="mx-2 fs-4">{isUserLogin.name}</span>
                   </>
                 ) : (
                   <>
                     <Link
-                      to="/login"
+                      to={LOGIN_ROUTE}
                       className="mx-2 btn btn-outline-primary"
                       type="button"
                     >
                       LogIn
                     </Link>
                     <Link
-                      to="/signup"
+                      to={SIGNUP_ROUTE}
                       className="mx-2 btn btn-primary"
                       type="button"
                     >
@@ -143,11 +152,13 @@ export default function Header({
           </div>
         </div>
       </nav>
+
       {showLogoutModal && (
-        <Logout
+        <LogoutModal
           setShowLogoutModal={setShowLogoutModal}
+          setIsUserLogin={setIsUserLogin}
+          setIsEditable={setIsEditable}
           setStorageDataChange={setStorageDataChange}
-          setCustomer={setCustomer}
         />
       )}
     </>

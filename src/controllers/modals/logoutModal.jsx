@@ -1,15 +1,23 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { LOGIN_ROUTE } from "../../constant/route.constant";
 
-export default function Logout({ setShowLogoutModal, setCustomer }) {
+export default function Logout({
+  setShowLogoutModal,
+  setIsUserLogin,
+  setIsEditable,
+  setStorageDataChange,
+}) {
   const navigate = useNavigate();
 
   const handleModalLogout = () => {
-    localStorage.removeItem("customerData");
+    localStorage.removeItem("loginUserData");
     setShowLogoutModal(false);
-    setCustomer({ isExist: false });
-    navigate("/");
+    setIsUserLogin({ isExist: false });
+    setIsEditable(false);
+    setStorageDataChange((prev) => !prev);
+    navigate({ LOGIN_ROUTE });
   };
 
   return (

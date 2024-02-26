@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaRegClock } from "react-icons/fa6";
 
@@ -30,15 +30,15 @@ export default function RecipeCard({
       <div className="col">
         <div className="card h-100 bg-secondary-subtle">
           <span className="position-absolute top-0 end-0 rounded-3 p-1 translate-middle-y bg-secondary">
-            <FaRegClock /> {recipe?.readyInMinutes}m
+            <FaRegClock /> {recipe.readyInMinutes}m
           </span>
-          <img src={recipe?.image} className="card-img-top" alt="" />
+          <img src={recipe.image} className="card-img-top" alt="" />
           <div className="card-body">
             <h5 className="card-title">
               {recipe.title}{" "}
               <img
                 className="mx-1"
-                src={recipe?.vegetarian ? veg : nonveg}
+                src={recipe.vegetarian ? veg : nonveg}
                 style={{ width: "25px" }}
               />
             </h5>
@@ -59,7 +59,7 @@ export default function RecipeCard({
               </div>
             )}
             <p className="fs-6 my-auto ms-auto">
-              Servings: <b>{recipe?.servings}</b>
+              Servings: <b>{recipe.servings}</b>
             </p>
           </div>
         </div>

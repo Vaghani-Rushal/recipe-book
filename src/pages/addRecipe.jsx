@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Input from "../form/Input";
+import Input from "../controllers/form/input";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   title_validation,
@@ -8,10 +8,12 @@ import {
   time_validation,
   instructions_validation,
   ingredients_validation,
-} from "../utils/AddFormValidation";
+} from "../utils/recipeDetailsValidation";
 import { useNavigate } from "react-router-dom";
-import Alert from "../alert/Alert";
-import { ThreeCircles } from "react-loader-spinner";
+import Alert from "../components/templates/alert/alert";
+
+import Loading from "../components/templates/spinner/loading";
+import { LOGIN_ROUTE } from "../constant/route.constant";
 
 export default function AddRecipe() {
   const navigate = useNavigate();
@@ -24,6 +26,24 @@ export default function AddRecipe() {
   });
 
   const onSubmit = methods.handleSubmit((data) => {
+    let loginUserData = localStorage.getItem("loginUserData");
+    if (loginUserData) loginUserData = JSON.parse(loginUserData);
+
+    if (!loginUserData?.isExist) {
+      setAlert({
+        show: true,
+        type: "danger",
+        message: "Login First!",
+      });
+
+      setTimeout(() => {
+        setAlert({ show: false, type: "danger", message: "Default Alert" });
+        navigate(LOGIN_ROUTE);
+      }, 1500);
+
+      return;
+    }
+
     const recipeObj = {
       vegetarian: data.isVeg === "veg",
       servings: data.recipeServing,
@@ -48,43 +68,31 @@ export default function AddRecipe() {
       }),
     };
 
-    let customerData = localStorage.getItem("customerData");
-    if (customerData) customerData = JSON.parse(customerData);
+    let recipeData = localStorage.getItem("recipeData");
+    recipeData = JSON.parse(recipeData);
+    recipeData.unshift(recipeObj);
 
-    if (!customerData?.isExist) {
-      setAlert({
-        show: true,
-        type: "danger",
-        message: "Login First!",
-      });
-      setTimeout(() => {
-        setAlert({ show: false, type: "danger", message: "Default Alert" });
-        navigate("/login");
-      }, 3000);
-    } else {
-      let recipeData = localStorage.getItem("recipeData");
-      recipeData = JSON.parse(recipeData);
-      recipeData.unshift(recipeObj);
+    localStorage.setItem("recipeData", JSON.stringify(recipeData));
 
-      localStorage.setItem("recipeData", JSON.stringify(recipeData));
+    methods.reset();
+    setAlert({
+      show: true,
+      type: "success",
+      message: "Recipe added successfully!",
+    });
 
-      methods.reset();
-      setAlert({
-        show: true,
-        type: "success",
-        message: "Recipe added successfully!",
-      });
-      setTimeout(() => {
-        setAlert({ show: false, type: "danger", message: "Default Alert" });
-      }, 1500);
-    }
+    setTimeout(() => {
+      setAlert({ show: false, type: "danger", message: "Default Alert" });
+    }, 1000);
   });
 
   return (
     <>
       {alert.show && <Alert alert={alert} />}
 
-      {!alert.show ? (
+      {alert.show ? (
+        <Loading />
+      ) : (
         <div className="container my-5">
           <div className="my-5 row justify-content-center mb-4">
             <div className="col-md-6 text-center fs-1">Add new Recipe</div>
@@ -154,18 +162,6 @@ export default function AddRecipe() {
               </button>
             </form>
           </FormProvider>
-        </div>
-      ) : (
-        <div className="d-flex justify-content-md-center align-items-center vh-100">
-          <ThreeCircles
-            visible={true}
-            height="100"
-            width="100"
-            color="#4fa94d"
-            ariaLabel="three-circles-loading"
-            wrapperStyle={{}}
-            wrapperClass=""
-          />
         </div>
       )}
     </>
